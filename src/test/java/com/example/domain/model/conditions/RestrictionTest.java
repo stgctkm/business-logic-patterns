@@ -4,7 +4,6 @@ import com.example.domain.model.conditions.map.RestrictionMap;
 import com.example.domain.model.conditions.table.RestrictionTable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 
