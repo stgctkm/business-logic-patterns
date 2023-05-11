@@ -73,7 +73,6 @@ public class DateRange {
     public DateRange intersectionWith(DateRange other) {
         if (!isOverLappedBy(other))
             throw new IllegalArgumentException("%s is not over rapped %s".formatted(this, other));
-        if (contains(other)) return other;
 
         LocalDate from = later(start, other.start);
         LocalDate to = former(end, other.end);
