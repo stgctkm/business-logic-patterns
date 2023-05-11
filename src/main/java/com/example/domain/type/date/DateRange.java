@@ -40,6 +40,13 @@ public class DateRange {
         return date.isAfter(end);
     }
 
+    /**
+     * 引数の期間を含むかどうか
+     */
+    public boolean contains(DateRange other) {
+        return contains(other.start) && contains(other.end);
+    }
+
     @Override
     public String toString() {
         return String.format("%s - %s", start, end);
