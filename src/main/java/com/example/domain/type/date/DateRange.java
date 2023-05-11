@@ -29,9 +29,7 @@ public class DateRange {
     }
 
     public boolean contains(LocalDate date) {
-        if (start.isAfter(date)) return false;
-        if (end.isBefore(date)) return false;
-        return true;
+        return !start.isAfter(date) && !end.isBefore(date);
     }
     public boolean isBeforeStart(LocalDate date) {
         return date.isBefore(start);
