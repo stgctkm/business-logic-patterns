@@ -22,7 +22,7 @@ public class DateRangeListBuilder {
      */
     public DateRangeList build() {
         sort();
-        if (totalDaysDateRangeList() != totalDaysOfOldestStartDateToLatestEndDate())
+        if (totalDaysDateRangeList() != totalDaysFromOldestStartDateToLatestEndDate())
             throw new IllegalStateException("全ての日をカバーしていません");
         return new DateRangeList(list);
     }
@@ -43,7 +43,7 @@ public class DateRangeListBuilder {
         this.list = list.stream().sorted(Comparator.comparing(range -> range.start)).toList();
     }
 
-    long totalDaysOfOldestStartDateToLatestEndDate() {
+    long totalDaysFromOldestStartDateToLatestEndDate() {
         LocalDate oldestStartDate = list.stream()
                 .map(range -> range.start)
                 .min(LocalDate::compareTo)

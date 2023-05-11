@@ -38,7 +38,6 @@ public class DateRange {
 
     /**
      * 期間が指定された日付後であるかを返却する
-     *
      * 日付が期間前であるかを返却する
      */
     public boolean isAfter(LocalDate date) {
@@ -47,7 +46,6 @@ public class DateRange {
 
     /**
      * 期間が指定された日付前であるかを返却する
-     *
      * 日付が期間後であるかを返却する
      */
     public boolean isBefore(LocalDate date) {
