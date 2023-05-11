@@ -102,11 +102,11 @@ public class DateRangeTest {
         DateRange range0831to0902 = DateRange.fromTo(date20180831, date20180902);
 
         assertAll(
-                () -> assertFalse(range0831to0902.isContains(date20180830), "期間前"),
-                () -> assertTrue(range0831to0902.isContains(other20180831), "期間開始日"),
-                () -> assertTrue(range0831to0902.isContains(date20180901), "期間中"),
-                () -> assertTrue(range0831to0902.isContains(other20180902), "期間終了日"),
-                () -> assertFalse(range0831to0902.isContains(date20180903), "期間後")
+                () -> assertFalse(range0831to0902.contains(date20180830), "期間前"),
+                () -> assertTrue(range0831to0902.contains(other20180831), "期間開始日"),
+                () -> assertTrue(range0831to0902.contains(date20180901), "期間中"),
+                () -> assertTrue(range0831to0902.contains(other20180902), "期間終了日"),
+                () -> assertFalse(range0831to0902.contains(date20180903), "期間後")
         );
     }
 
