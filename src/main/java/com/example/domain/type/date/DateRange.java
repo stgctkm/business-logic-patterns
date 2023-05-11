@@ -79,6 +79,20 @@ public class DateRange {
         return DateRange.fromTo(from, to);
     }
 
+    /**
+     * 期間が指定された期間より後であるかを返却する
+     */
+    public boolean isAfter(DateRange other) {
+        return start.isAfter(other.end);
+    }
+
+    /**
+     * 期間が指定された期間より前であるかを返却する
+     */
+    public boolean isBefore(DateRange other) {
+        return end.isBefore(other.start);
+    }
+
     @Override
     public String toString() {
         return String.format("%s - %s", start, end);

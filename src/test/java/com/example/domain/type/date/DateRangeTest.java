@@ -238,4 +238,44 @@ public class DateRangeTest {
             );
         }
     }
+
+    @Nested
+    class 期間の前後関係 {
+
+        @Nested
+        class 期間前の判定 {
+            DateRange sut = DateRange.fromTo(LocalDate.parse("2023-04-21"), LocalDate.parse("2023-05-12"));
+
+            @Test
+            void 指定された期間より前の期間であればtrueを返却する() {
+                DateRange laterRange = DateRange.fromTo(LocalDate.parse("2023-05-21"), LocalDate.parse("2023-06-12"));
+                assertTrue(sut.isBefore(laterRange));
+            }
+
+            @Test
+            void 一部でも重なっている期間の場合はfalseを返却する() {
+                DateRange laterRange = DateRange.fromTo(LocalDate.parse("2023-05-12"), LocalDate.parse("2023-06-12"));
+                assertFalse(sut.isBefore(laterRange));
+            }
+        }
+
+        @Nested
+        class 期間後の判定 {
+            DateRange sut = DateRange.fromTo(LocalDate.parse("2023-04-21"), LocalDate.parse("2023-05-12"));
+
+            @Test
+            void 指定された期間より後の期間であればtrueを返却する() {
+                DateRange laterRange = DateRange.fromTo(LocalDate.parse("2023-01-21"), LocalDate.parse("2023-02-12"));
+                assertTrue(sut.isAfter(laterRange));
+            }
+
+            @Test
+            void 一部でも重なっている期間の場合はfalseを返却する() {
+                DateRange laterRange = DateRange.fromTo(LocalDate.parse("2023-03-29"), LocalDate.parse("2023-04-21"));
+                assertFalse(sut.isAfter(laterRange));
+            }
+        }
+
+    }
+
 }
