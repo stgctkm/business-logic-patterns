@@ -98,7 +98,6 @@ public class DateRangeTest {
         }
     }
 
-
     @Nested
     class 日付の期間範囲判定 {
         @Test
@@ -135,11 +134,11 @@ public class DateRangeTest {
             DateRange range0831to0902 = DateRange.fromTo(date20180831, date20180902);
 
             assertAll(
-                    () -> assertTrue(range0831to0902.isBeforeStart(date20180830), "期間前"),
-                    () -> assertFalse(range0831to0902.isBeforeStart(other20180831), "期間開始日"),
-                    () -> assertFalse(range0831to0902.isBeforeStart(date20180901), "期間中"),
-                    () -> assertFalse(range0831to0902.isBeforeStart(other20180902), "期間終了日"),
-                    () -> assertFalse(range0831to0902.isBeforeStart(date20180903), "期間後")
+                    () -> assertTrue(range0831to0902.isAfter(date20180830), "期間前"),
+                    () -> assertFalse(range0831to0902.isAfter(other20180831), "期間開始日"),
+                    () -> assertFalse(range0831to0902.isAfter(date20180901), "期間中"),
+                    () -> assertFalse(range0831to0902.isAfter(other20180902), "期間終了日"),
+                    () -> assertFalse(range0831to0902.isAfter(date20180903), "期間後")
             );
         }
 
@@ -156,11 +155,11 @@ public class DateRangeTest {
             DateRange range0831to0902 = DateRange.fromTo(date20180831, date20180902);
 
             assertAll(
-                    () -> assertFalse(range0831to0902.isAfterEnd(date20180830), "期間前"),
-                    () -> assertFalse(range0831to0902.isAfterEnd(other20180831), "期間開始日"),
-                    () -> assertFalse(range0831to0902.isAfterEnd(date20180901), "期間中"),
-                    () -> assertFalse(range0831to0902.isAfterEnd(other20180902), "期間終了日"),
-                    () -> assertTrue(range0831to0902.isAfterEnd(date20180903), "期間後")
+                    () -> assertFalse(range0831to0902.isBefore(date20180830), "期間前"),
+                    () -> assertFalse(range0831to0902.isBefore(other20180831), "期間開始日"),
+                    () -> assertFalse(range0831to0902.isBefore(date20180901), "期間中"),
+                    () -> assertFalse(range0831to0902.isBefore(other20180902), "期間終了日"),
+                    () -> assertTrue(range0831to0902.isBefore(date20180903), "期間後")
             );
         }
     }
@@ -182,6 +181,59 @@ public class DateRangeTest {
                     arguments("開始日が期間外、終了日が期間内", DateRange.fromTo(LocalDate.parse("2023-04-20"), LocalDate.parse("2023-05-12")), false),
                     arguments("開始日が期間内、終了日が期間外", DateRange.fromTo(LocalDate.parse("2023-04-21"), LocalDate.parse("2023-05-13")), false),
                     arguments( "対象期間を含む期間", DateRange.fromTo(LocalDate.parse("2000-04-29"), LocalDate.parse("2100-05-01")), false),
+                    arguments( "重なりのない期間", DateRange.fromTo(LocalDate.parse("2022-04-29"), LocalDate.parse("2022-05-01")), false)
+            );
+        }
+    }
+
+    @Nested
+    class 重なっている期間の返却 {
+        DateRange sut = DateRange.fromTo(LocalDate.parse("2023-04-29"), LocalDate.parse("2023-05-07"));
+
+        @ParameterizedTest
+        @MethodSource("テスト対象期間")
+        void 重なっている期間を返却する(String message, DateRange other, DateRange expected) {
+            assertTrue(expected.isSame(sut.intersectionWith(other)), message);
+        }
+
+        static List<Arguments> テスト対象期間() {
+            return List.of(
+                    arguments("期間内", DateRange.fromTo(LocalDate.parse("2023-05-01"), LocalDate.parse("2023-05-02")), DateRange.fromTo(LocalDate.parse("2023-05-01"), LocalDate.parse("2023-05-02"))),
+                    arguments("開始日が期間内", DateRange.fromTo(LocalDate.parse("2023-05-03"), LocalDate.parse("2023-05-12")), DateRange.fromTo(LocalDate.parse("2023-05-03"), LocalDate.parse("2023-05-07"))),
+                    arguments("終了日が期間内", DateRange.fromTo(LocalDate.parse("2023-04-20"), LocalDate.parse("2023-05-01")), DateRange.fromTo(LocalDate.parse("2023-04-29"), LocalDate.parse("2023-05-01")))
+            );
+        }
+
+        @Test
+        void 重なっている期間がない場合にはIllegalArgumentExceptionを返却する() {
+            DateRange other = DateRange.fromTo(LocalDate.parse("2024-05-01"), LocalDate.parse("2024-05-02"));
+            assertThrows(IllegalArgumentException.class, () -> sut.intersectionWith(other));
+        }
+
+        @Test
+        void 同じ期間を指定された場合には期間を返却する() {
+            DateRange other = DateRange.fromTo(LocalDate.parse("2023-04-29"), LocalDate.parse("2023-05-07"));
+            assertTrue(sut.isSame(sut.intersectionWith(other)));
+        }
+
+    }
+
+    @Nested
+    class 期間が重なっているか {
+        DateRange sut = DateRange.fromTo(LocalDate.parse("2023-04-21"), LocalDate.parse("2023-05-12"));
+        @ParameterizedTest
+        @MethodSource("重なっている期間のテスト期間")
+        void 期間が重なっている(String message, DateRange other, boolean expected) {
+            assertEquals(expected, sut.isOverLappedBy(other), message);
+        }
+
+        static List<Arguments> 重なっている期間のテスト期間() {
+            return List.of(
+                    arguments("開始日、終了日ともに期間内", DateRange.fromTo(LocalDate.parse("2023-04-22"), LocalDate.parse("2023-05-11")), true),
+                    arguments("開始日、終了日とも同一の期間", DateRange.fromTo(LocalDate.parse("2023-04-21"), LocalDate.parse("2023-05-12")), true),
+                    arguments("開始日が期間外、終了日が期間内", DateRange.fromTo(LocalDate.parse("2023-04-20"), LocalDate.parse("2023-05-12")), true),
+                    arguments("開始日が期間内、終了日が期間外", DateRange.fromTo(LocalDate.parse("2023-04-21"), LocalDate.parse("2023-05-13")), true),
+                    arguments( "対象期間を含む期間", DateRange.fromTo(LocalDate.parse("2000-04-29"), LocalDate.parse("2100-05-01")), true),
                     arguments( "重なりのない期間", DateRange.fromTo(LocalDate.parse("2022-04-29"), LocalDate.parse("2022-05-01")), false)
             );
         }

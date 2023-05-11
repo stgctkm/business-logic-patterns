@@ -28,25 +28,81 @@ public class DateRange {
         return new DateRange(LocalDate.now(), end);
     }
 
+    /**
+     * 日付が期間内であるかを返却する
+     */
     public boolean contains(LocalDate date) {
-        return !start.isAfter(date) && !end.isBefore(date);
+        return !isAfter(date) && !isBefore(date);
     }
-    public boolean isBeforeStart(LocalDate date) {
+
+    /**
+     * 期間が指定された日付後であるかを返却する
+     *
+     * 日付が期間前であるかを返却する
+     */
+    public boolean isAfter(LocalDate date) {
         return date.isBefore(start);
     }
-    public boolean isAfterEnd(LocalDate date) {
+
+    /**
+     * 期間が指定された日付前であるかを返却する
+     *
+     * 日付が期間後であるかを返却する
+     */
+    public boolean isBefore(LocalDate date) {
         return date.isAfter(end);
     }
 
     /**
-     * 引数の期間を含むかどうか
+     * 引数の期間を含むかを返却する
      */
     public boolean contains(DateRange other) {
         return contains(other.start) && contains(other.end);
+    }
+
+    /**
+     * 期間が重なっているかを返却する
+     */
+    public boolean isOverLappedBy(DateRange other) {
+        return !start.isAfter(other.end) && !end.isBefore(other.start);
+    }
+
+    /**
+     * 重なっている期間を返却する
+     */
+    public DateRange intersectionWith(DateRange other) {
+        if (!isOverLappedBy(other))
+            throw new IllegalArgumentException("%s is not over rapped %s".formatted(this, other));
+        if (contains(other)) return other;
+
+        LocalDate from = later(start, other.start);
+        LocalDate to = former(end, other.end);
+        return DateRange.fromTo(from, to);
     }
 
     @Override
     public String toString() {
         return String.format("%s - %s", start, end);
     }
+
+    public boolean isSame(DateRange other) {
+        return start.isEqual(other.start) && end.isEqual(other.end);
+    }
+
+    /**
+     * より早い日付を返却する
+     */
+    LocalDate former(LocalDate one, LocalDate other) {
+        if (one.isBefore(other)) return one;
+        return other;
+    }
+
+    /**
+     * より遅い日付返却する
+     */
+    LocalDate later(LocalDate one, LocalDate other) {
+        if (one.isBefore(other)) return other;
+        return one;
+    }
+
 }
