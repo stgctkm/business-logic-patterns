@@ -61,6 +61,20 @@ public class DateRange {
     }
 
     /**
+     * 期間が指定された期間より後であるかを返却する
+     */
+    public boolean isAfter(DateRange other) {
+        return start.isAfter(other.end);
+    }
+
+    /**
+     * 期間が指定された期間より前であるかを返却する
+     */
+    public boolean isBefore(DateRange other) {
+        return end.isBefore(other.start);
+    }
+
+    /**
      * 期間が重なっているかを返却する
      */
     public boolean isOverLappedBy(DateRange other) {
@@ -79,18 +93,12 @@ public class DateRange {
         return DateRange.fromTo(from, to);
     }
 
-    /**
-     * 期間が指定された期間より後であるかを返却する
-     */
-    public boolean isAfter(DateRange other) {
-        return start.isAfter(other.end);
+    public LocalDate first() {
+        return start;
     }
 
-    /**
-     * 期間が指定された期間より前であるかを返却する
-     */
-    public boolean isBefore(DateRange other) {
-        return end.isBefore(other.start);
+    public LocalDate last() {
+        return end;
     }
 
     @Override
@@ -103,7 +111,7 @@ public class DateRange {
     }
 
     /**
-     * より早い日付を返却する
+     * より前の日付を返却する
      */
     LocalDate former(LocalDate one, LocalDate other) {
         if (one.isBefore(other)) return one;
@@ -111,7 +119,7 @@ public class DateRange {
     }
 
     /**
-     * より遅い日付返却する
+     * より後ろの日付返却する
      */
     LocalDate later(LocalDate one, LocalDate other) {
         if (one.isBefore(other)) return other;
