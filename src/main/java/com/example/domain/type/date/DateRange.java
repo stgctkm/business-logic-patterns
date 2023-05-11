@@ -1,6 +1,7 @@
 package com.example.domain.type.date;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 /**
  * 期間
@@ -91,6 +92,14 @@ public class DateRange {
         LocalDate from = later(start, other.start);
         LocalDate to = former(end, other.end);
         return DateRange.fromTo(from, to);
+    }
+
+    /**
+     * 期間の総日数を取得する
+     * 開始日、終了日を含む総日数を取得する
+     */
+    public long toTotalDays() {
+        return ChronoUnit.DAYS.between(start, end) + 1;
     }
 
     public LocalDate first() {
