@@ -1,6 +1,7 @@
 package com.example.domain.type.date;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 /**
  * 期間
@@ -28,20 +29,108 @@ public class DateRange {
         return new DateRange(LocalDate.now(), end);
     }
 
-    public boolean isContains(LocalDate date) {
-        if (start.isAfter(date)) return false;
-        if (end.isBefore(date)) return false;
-        return true;
+    /**
+     * 日付が期間内であるかを返却する
+     */
+    public boolean contains(LocalDate date) {
+        return !isAfter(date) && !isBefore(date);
     }
-    public boolean isBeforeStart(LocalDate date) {
+
+    /**
+     * 期間が指定された日付後であるかを返却する
+     * 日付が期間前であるかを返却する
+     */
+    public boolean isAfter(LocalDate date) {
         return date.isBefore(start);
     }
-    public boolean isAfterEnd(LocalDate date) {
+
+    /**
+     * 期間が指定された日付前であるかを返却する
+     * 日付が期間後であるかを返却する
+     */
+    public boolean isBefore(LocalDate date) {
         return date.isAfter(end);
+    }
+
+    /**
+     * 引数の期間を含むかを返却する
+     */
+    public boolean contains(DateRange other) {
+        return contains(other.start) && contains(other.end);
+    }
+
+    /**
+     * 期間が指定された期間より後であるかを返却する
+     */
+    public boolean isAfter(DateRange other) {
+        return start.isAfter(other.end);
+    }
+
+    /**
+     * 期間が指定された期間より前であるかを返却する
+     */
+    public boolean isBefore(DateRange other) {
+        return end.isBefore(other.start);
+    }
+
+    /**
+     * 期間が重なっているかを返却する
+     */
+    public boolean isOverLappedBy(DateRange other) {
+        return !start.isAfter(other.end) && !end.isBefore(other.start);
+    }
+
+    /**
+     * 重なっている期間を返却する
+     */
+    public DateRange intersectionWith(DateRange other) {
+        if (!isOverLappedBy(other))
+            throw new IllegalArgumentException("%s is not over rapped %s".formatted(this, other));
+
+        LocalDate from = later(start, other.start);
+        LocalDate to = former(end, other.end);
+        return DateRange.fromTo(from, to);
+    }
+
+    /**
+     * 期間の総日数を取得する
+     * 開始日、終了日を含む総日数を取得する
+     */
+    public long toTotalDays() {
+        return ChronoUnit.DAYS.between(start, end) + 1;
+    }
+
+    public LocalDate first() {
+        return start;
+    }
+
+    public LocalDate last() {
+        return end;
     }
 
     @Override
     public String toString() {
         return String.format("%s - %s", start, end);
     }
+
+    public boolean isSame(DateRange other) {
+        return start.isEqual(other.start) && end.isEqual(other.end);
+    }
+
+    /**
+     * より前の日付を返却する
+     */
+    LocalDate former(LocalDate one, LocalDate other) {
+        if (one.isBefore(other)) return one;
+        return other;
+    }
+
+    /**
+     * より後ろの日付返却する
+     */
+    LocalDate later(LocalDate one, LocalDate other) {
+        if (one.isBefore(other)) return other;
+        return one;
+    }
+
 }
